@@ -9,7 +9,9 @@
   "types": "dist/index.d.js",
   "scripts": {
     "test": "ava",
-    "build": "rollup -c"
+    "prepare": "npm run build",
+    "build": "npm run clean && rollup -c",
+    "clean": "node -e \"fs.rmSync('dist', {recursive:true, force:true})\""
   },
   "repository": {
     "type": "git",
