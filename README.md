@@ -4,32 +4,60 @@
 ## Description
 
 This is a rollup plugin to bundle the wasm file.
-This plugin is primarily developped for dealing with the Rust wasm-pack output files.
+This plugin is primarily developped to deal with the Rust wasm-pack output files.
 
-## Usages
+## Usage
 
-TODO: how to install
+Install this package by `npm install rollup-plugin-rusty-wasm --save-dev`,
+then import the module and add to the rollup plugins.
 
 ```js
 // rollup.config.js
 import rustywasm from "rollup-plugin-rusty-wasm";
 
 export default {
-    input: "src/index.js",
-    output: {
-        dir: "dist",
-    },
+    //
     plugins: [
+        //
         rustyWasm(),
     ],
 }
 ```
 
-This plugin assumes wasm files to have correct module paths in the inport records.
+This plugin expects wasm files to have import records specifying the importable module paths.
 
-When you use the output of `wasm-pack` or `wasm-bindgen`,
-`--target` must be set `bundler` (default) and
-the contents of the output directory (`*.wasm` and `*.js`) be preserved.
+### Using `wasm-pack` output
+
+When using this plugin with the `wasm-pack` or `wasm-bindgen` output,
+set the option `--target bundler` (or omit `--target` to use default).
+
+```sh
+$ wasm-pack build --target bundler
+or
+$ wasm-pack build
+```
+
+Furthermore, this plugin requires `pkg/foo_bg.wasm` be imported before `pkg/foo_bg.js`
+(for the circular dependency between `foo_bg.wasm` and `foo_bg.js`).
+This order is preserved if `pkg/foo.js` is imported instead of `pkg/foo_bg.js`.
+As `foo.js` exports everything from `foo_bg.js`,
+importing `foo_bg.js` directly is not recommanded.
+
+Importing `pkg/foo_bg.wasm` directly is safe anywhere.
+
+```js
+import { someFunc } from './pkg/foo';               // OK (normally resolved to foo.js)
+```
+
+```js
+// not works
+import { someFunc } from './pkg/foo_bg';            // NG (normally resolved to foo_bg.js)
+```
+
+```js
+import { init, memory } from './pkg/foo_bg.wasm';   // OK (useful to access internal memory)
+import { someFunc } from './pkg/foo';               // these two lines may be swapped.
+```
 
 
 ## Options
@@ -120,13 +148,13 @@ For more description, see the section: Options Target.
 
 Specifies how to load the wasm file.
 
-If set `'buffered'`, wasm files are loaded by `fetch()` [[mdn](https://developer.mozilla.org/en-US/docs/Web/API/fetch)] then compiled by `WebAssembly.compile()` [[mdn](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/compile)].
+If set `'buffered'`, wasm files are loaded by `fetch()` [[mdn](https://developer.mozilla.org/en-US/docs/Web/API/fetch)] and the responses are buffered and compiled by `WebAssembly.compile()` [[mdn](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/compile)].
 
-If set `'streaming'`, wasm files are loaded and compiled by `WebAssembly.compileStreaming()` [[mdn](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/compileStreaming)].
+If set `'streaming'`, wasm files are loaded by `fetch()` then compiled by `WebAssembly.compileStreaming()` [[mdn](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/compileStreaming)].
 
-Note that while `'streaming'` is more desirable than `'buffered'` for efficiency, `streaming` requires the server to emit wasm files with the mime-type `application/wasm` (some test servers will fail).
+`'streaming'` is more desirable than `'buffered'` for efficiency, but `streaming` requires wasm files be sent with `application/wasm` mime-type (some test servers will fail, especially if the `.wasm` extension is missing).
 
-If set `inline`, wasm files are embedded in the bundle file as strings encoded by the *uuencode* variant (a cousin of the Base64 encoding).
+If set `inline`, wasm files are embedded in the bundle file as strings encoded by the *uuencode* variant (a cousin of the Base64-encode).
 
 
 ### `OptionItem.renameWasm`
