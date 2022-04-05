@@ -37,13 +37,13 @@ or
 $ wasm-pack build
 ```
 
-Furthermore, this plugin requires `pkg/foo_bg.wasm` be imported before `pkg/foo_bg.js`
-(for the circular dependency between `foo_bg.wasm` and `foo_bg.js`).
-This order is preserved if `pkg/foo.js` is imported instead of `pkg/foo_bg.js`.
-As `foo.js` exports everything from `foo_bg.js`,
-importing `foo_bg.js` directly is not recommanded.
+Furthermore, this plugin requires `pkg/{crate}_bg.wasm` be imported before `pkg/{crate}_bg.js`
+(for the circular dependency between `{crate}_bg.wasm` and `{crate}_bg.js`).
+This order is preserved if `pkg/{crate}.js` is imported first.
+As `{crate}.js` exports everything from `{crate}_bg.js`,
+importing `{crate}_bg.js` directly is not recommanded.
 
-Importing `pkg/foo_bg.wasm` directly is safe anywhere.
+Importing `pkg/{crate}_bg.wasm` directly is safe anywhere.
 
 ```js
 import { someFunc } from './pkg/foo';               // OK (normally resolved to foo.js)
