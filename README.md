@@ -8,12 +8,12 @@ This plugin is primarily developped to deal with the Rust wasm-pack output files
 
 ## Usage
 
-Install this package by `npm install rollup-plugin-rusty-wasm --save-dev`,
+Install this package by `npm install @nomaton/rollup-plugin-rusty-wasm --save-dev`,
 then import the module and add to the rollup plugins.
 
 ```js
 // rollup.config.js
-import rustywasm from "rollup-plugin-rusty-wasm";
+import rustyWasm from "@nomaton/rollup-plugin-rusty-wasm";
 
 export default {
     //
