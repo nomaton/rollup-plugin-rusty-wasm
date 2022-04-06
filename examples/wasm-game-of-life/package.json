@@ -1,0 +1,19 @@
+{
+  "name": "wasm-game-of-life",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "scripts": {
+    "start-esm": "rollup -c rollup-esm.config.js",
+    "start-iife": "rollup -c rollup-iife.config.js",
+    "start-inline": "rollup -c rollup-inline.config.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomaton/rollup-plugin-rusty-wasm": "^0.9.0",
+    "rollup": "^2.70.1",
+    "rollup-plugin-copy": "^3.4.0",
+    "rollup-plugin-serve": "^1.1.0"
+  }
+}
