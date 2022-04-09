@@ -59,6 +59,10 @@ import { init, memory } from './pkg/foo_bg.wasm';   // OK (useful to access inte
 import { someFunc } from './pkg/foo';               // these two lines may be swapped.
 ```
 
+## Examples
+
+- [Game of Life](https://github.com/nomaton/rollup-plugin-rusty-wasm/tree/main/examples/wasm-game-of-life)
+
 
 ## Options
 
