@@ -40,40 +40,6 @@ export default function rustyWasm(options: Options): Plugin {
             if (virtual.isVirtualId(source)) {
                 // pass virtual id as is.
                 return source;
-            } else if (REG_WASM.test(source)) {
-                // resolve original id (expecting local file path)
-                const origId = await this.resolve(source, importer, { skipSelf: true, ...options });
-
-                if (origId === null || origId.external || origId.id.startsWith("\0")) {
-                    // it seems not local file path, return as is
-                    return origId;
-                }
-
-                // workaround circular dependency of the wasm-pack output
-                // (foo_bg.wasm => foo_bg.js => foo_bg.wasm)
-                await this.load(origId); // load and make entry in wasmCache
-
-                const wasmId = origId.id;
-                const wasmData = wasmCache.get(wasmId);
-                if (wasmData === undefined) {
-                    this.error(`failed in getting cached wasm data (plugin bug)`)
-                }
-
-                const importedModules = new Set<string>();
-                for (const { module } of wasmData.analysed.imports) {
-                    importedModules.add(module);
-                }
-
-                for (const importedModule of importedModules) {
-                    const importedId = await this.resolve(importedModule, wasmId, { skipSelf: true, ...options });
-                    if (importedId !== null && !importedId.external && importedId.id === importer) {
-                        // conclude as circular import
-                        return virtual.composeVirtualId({ type: 'proxy', wasmId })
-                    }
-                }
-
-                return wasmId;
-
             } else {
                 return null;
             }
